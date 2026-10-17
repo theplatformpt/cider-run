@@ -47,7 +47,7 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
 - Best of up to 3 trials counts: lowest sprint time, highest jump.
 - Divisions are age group × sex. Default groups: 10 & under, 11–13, 14–17, 18–34, 35–49, 50+.
 - Places use competition ranking: a tie shares a place (1, 2, 2, 4).
-- Overall = average of the athlete's sprint and jump percentile within their division (share of the division they beat, ties count half; a division of one gets 100). Needs both tests.
+- Overall = average of the athlete's sprint and jump percentile within their division (share of the division they beat, ties count half; a division of one gets 100). Needs both tests. Public pages show the overall **place** only, never the number, so last place never reads as "0". The number is in the staff Results CSV.
 - Public pages show first name + last initial and bib only. Emails, phones and results links are staff-only.
 
 ## Capacity

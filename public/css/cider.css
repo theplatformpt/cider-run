@@ -85,6 +85,7 @@ ol.rank{list-style:none;margin:0;padding:4px 8px 10px}
 .who b{display:block;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .who span{font-size:12.5px;color:var(--muted)}
 .val{font-weight:900;font-size:20px;text-align:right;white-space:nowrap}
+.val .pair{display:block;font-size:15px;line-height:1.2}
 .val small{font-size:12px;font-weight:700;color:var(--muted);margin-left:2px}
 .more{display:block;width:100%;border:0;border-top:1px solid var(--line);background:transparent;padding:11px;font-weight:800;color:var(--orange-ink);cursor:pointer}
 .empty{padding:26px 18px;text-align:center;color:var(--muted)}

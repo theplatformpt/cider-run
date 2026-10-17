@@ -1,4 +1,4 @@
-import { $, esc, ordinal, fmtS, fmtJ, fmtO, ago, poll, api } from './common.js';
+import { $, esc, ordinal, fmtS, fmtJ, ago, poll, api } from './common.js';
 
 const token = location.pathname.split('/').filter(Boolean)[1] || '';
 let data = null, ok = true, formShown = false;
@@ -37,10 +37,9 @@ function render() {
       <div class="tr">${trials(a.jump.trials, fmtJ, 'in')}</div>
     </div>
     <div class="stat lead">
-      <div class="k">Overall score</div>
-      <div class="v">${a.overall.score !== null ? fmtO(a.overall.score) : '–'}${a.overall.score !== null ? '<small> / 100</small>' : ''}</div>
-      ${showPlaces && a.overall.place ? `<div class="place">${place(a.overall.place, a.overall.of)}</div>` : ''}
-      <div class="tr">${a.overall.score !== null ? 'Average of your sprint and jump percentiles in your division.' : 'Finish both tests to get an overall score.'}</div>
+      <div class="k">Overall place</div>
+      <div class="v">${showPlaces && a.overall.place ? `${ordinal(a.overall.place)}<small> of ${a.overall.of}</small>` : '–'}</div>
+      <div class="tr">${a.overall.place === null ? 'Finish both tests to get an overall place.' : showPlaces ? `In ${esc(a.division)}, ranking your sprint and jump together.` : 'Places show when results go live.'}</div>
     </div>`;
   if (!formShown) {
     formShown = true;

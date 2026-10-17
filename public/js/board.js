@@ -1,4 +1,4 @@
-import { $, $$, esc, ordinal, fmtS, fmtJ, fmtO, ago, poll } from './common.js';
+import { $, $$, esc, ordinal, fmtS, fmtJ, ago, poll } from './common.js';
 
 const params = new URLSearchParams(location.search);
 const S = {
@@ -23,12 +23,12 @@ function saveUrl() {
 function value(r, tab) {
   if (tab === 's') return `${fmtS(r.s)}<small>s</small>`;
   if (tab === 'j') return `${fmtJ(r.j)}<small>in</small>`;
-  return `${fmtO(r.o)}`;
+  // Overall shows place only (the badge) plus the athlete's two marks, never a score.
+  return `<span class="pair">${fmtS(r.s)}<small>s</small><br>${fmtJ(r.j)}<small>in</small></span>`;
 }
 
 function sub(r, tab) {
   const bib = `#${r.b}`;
-  if (tab === 'o') return `${bib} · ${fmtS(r.s)} s · ${fmtJ(r.j)} in`;
   return bib;
 }
 
@@ -63,7 +63,7 @@ function renderSearch(rows) {
       <ol class="rank">
         <li><span class="badge ${r.sr && r.sr <= 3 ? 'p' + r.sr : ''}">${r.sr ?? '–'}</span><span class="who"><b>${S.data.yards}-yd dash</b><span>${r.sr ? ordinal(r.sr) + ' in division' : 'Not tested yet'}</span></span><span class="val">${r.s !== null ? value(r, 's') : '–'}</span></li>
         <li><span class="badge ${r.jr && r.jr <= 3 ? 'p' + r.jr : ''}">${r.jr ?? '–'}</span><span class="who"><b>Vertical jump</b><span>${r.jr ? ordinal(r.jr) + ' in division' : 'Not tested yet'}</span></span><span class="val">${r.j !== null ? value(r, 'j') : '–'}</span></li>
-        <li><span class="badge ${r.or && r.or <= 3 ? 'p' + r.or : ''}">${r.or ?? '–'}</span><span class="who"><b>Overall</b><span>${r.or ? ordinal(r.or) + ' in division' : 'Needs both tests'}</span></span><span class="val">${r.o !== null ? fmtO(r.o) : '–'}</span></li>
+        <li><span class="badge ${r.or && r.or <= 3 ? 'p' + r.or : ''}">${r.or ?? '–'}</span><span class="who"><b>Overall</b><span>${r.or ? ordinal(r.or) + ' in division' : 'Needs both tests'}</span></span><span class="val">${r.or ? ordinal(r.or) : '–'}</span></li>
       </ol>
       <button class="more" data-follow="${r.b}">${r.b === S.me ? '★ Highlighted on the board' : 'Highlight me on the board'}</button>
     </section>`).join('')}</div>`;
@@ -99,7 +99,7 @@ function render() {
     }
   }
   if (!divs.length) {
-    const what = S.tab === 'o' ? 'overall scores (they need both tests)' : 'results';
+    const what = S.tab === 'o' ? 'overall places (they need both tests)' : 'results';
     board.innerHTML = `<div class="card empty" style="margin-top:14px"><b>No ${what} here yet</b>Results show up the moment our team enters them.</div>`;
     return;
   }
