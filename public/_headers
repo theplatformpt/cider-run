@@ -1,0 +1,16 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'
+
+/staff/*
+  X-Robots-Tag: noindex, nofollow
+/r/*
+  X-Robots-Tag: noindex, nofollow
+/tv/*
+  X-Robots-Tag: noindex, nofollow
+
+/brand/*
+  Cache-Control: public, max-age=604800

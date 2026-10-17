@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Live Leaderboard · Cider Run Jump &amp; Speed Contest</title>
+<meta name="description" content="Live results from The Platform's Cider Run Jump & Speed Contest.">
+<meta name="theme-color" content="#B3261E">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap">
+<link rel="stylesheet" href="/css/cider.css">
+</head>
+<body>
+<div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<main class="wrap">
+  <section class="card hero" aria-labelledby="h1">
+    <div class="eyebrow"><img src="/brand/mark-96.png" alt="" width="22" height="22"><span id="event">1st Annual Platform Cider Run</span></div>
+    <h1 id="h1"><span id="title">Jump &amp; Speed Contest</span> <span class="apple" aria-hidden="true">🍎</span></h1>
+    <p class="sub">Live leaderboard. Results appear seconds after our team enters them.</p>
+    <div class="live" id="live" role="status"><span class="dot" aria-hidden="true"></span><span id="liveText">Connecting…</span></div>
+    <div class="counts" id="counts"></div>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Leaderboard">
+    <button role="tab" id="t-o" aria-selected="true" data-tab="o">Overall</button>
+    <button role="tab" id="t-s" aria-selected="false" data-tab="s"><span id="sprintTab">40-Yd Dash</span></button>
+    <button role="tab" id="t-j" aria-selected="false" data-tab="j">Vertical Jump</button>
+  </div>
+
+  <div class="filters">
+    <div class="chips" role="group" aria-label="Sex" id="sexChips">
+      <button class="chip" data-x="A" aria-pressed="true">Everyone</button>
+      <button class="chip" data-x="F" aria-pressed="false">Female</button>
+      <button class="chip" data-x="M" aria-pressed="false">Male</button>
+    </div>
+    <div class="chips" role="group" aria-label="Age group" id="ageChips"></div>
+    <label class="search"><span class="sr">Find an athlete by name or bib</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Find yourself: name or bib #" autocomplete="off" enterkeyhint="search">
+    </label>
+  </div>
+
+  <div id="board" aria-live="polite"></div>
+
+  <details class="how">
+    <summary>How the overall score works</summary>
+    <p>Everyone is ranked inside their own division (age group and sex). Your sprint and jump each get a percentile: the share of your division you beat, from 0 to 100. Overall is the average of the two, so you need both tests to get one. Best of up to 3 trials counts for each test.</p>
+  </details>
+</main>
+
+<footer class="foot">
+  <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="inner">
+    <div class="lock"><img class="m" src="/brand/mark-96.png" alt="" width="38" height="38"><img class="w" src="/brand/wordmark-120.png" alt="The Platform" height="22"></div>
+    <strong style="color:#FFFAF0">The Platform Performance &amp; Sports Rehab</strong><br>
+    8996 W Union Hills Dr, Ste 107, Peoria, AZ<br>
+    <a href="tel:+16023610487">602-361-0487</a> &nbsp;•&nbsp; <a href="https://www.instagram.com/platform.pt/" rel="noopener">@platform.pt</a>
+  </div>
+</footer>
+<script src="/js/board.js" type="module"></script>
+</body>
+</html>

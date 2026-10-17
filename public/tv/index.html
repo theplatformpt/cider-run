@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TV · Cider Run Jump &amp; Speed Contest</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap">
+<link rel="stylesheet" href="/css/cider.css">
+<style>
+  html,body{height:100%}
+  body{overflow:hidden;font-size:1.6vw}
+  .tv{display:grid;grid-template-columns:1fr 20vw;grid-template-rows:auto 1fr;gap:1.6vw;padding:1.6vw 2vw;height:calc(100% - 8px)}
+  .tv header{grid-column:1/-1;display:flex;align-items:flex-end;justify-content:space-between;gap:2vw}
+  .tv h1{font-size:4vw;color:var(--red);line-height:1}
+  .tv .eyebrow{font-size:1vw}
+  .tv .eyebrow img{width:2vw;height:2vw}
+  .tv .divname{font-size:3.2vw;font-weight:900;color:var(--ink);text-align:right;line-height:1}
+  .tv .divname small{display:block;font-size:1.1vw;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4vw}
+  .cols{align-self:stretch;display:grid;grid-template-columns:repeat(3,1fr);gap:1.4vw;min-height:0}
+  .col{background:var(--card);border-radius:1.2vw;padding:1.2vw 1.2vw .6vw;min-height:0;overflow:hidden}
+  .col h2{font-size:1.7vw;color:var(--red);margin-bottom:.6vw}
+  .col ol{list-style:none;margin:0;padding:0}
+  .col li{display:grid;grid-template-columns:3vw 1fr auto;align-items:center;gap:1vw;padding:.8vw 0;border-bottom:2px dashed var(--line)}
+  .col li:last-child{border-bottom:0}
+  .col .badge{width:2.6vw;height:2.6vw;font-size:1.2vw}
+  .col b{font-size:1.6vw;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .col .v{font-size:2vw;font-weight:900;white-space:nowrap}
+  .col .v small{font-size:1vw;color:var(--muted)}
+  .col .none{color:var(--muted);padding:1vw 0}
+  aside{background:var(--card);border-radius:1.2vw;padding:1.4vw;display:grid;align-content:start;justify-items:center;gap:1vw;text-align:center}
+  aside svg{width:100%;height:auto;border-radius:.8vw}
+  aside .big{font-size:1.6vw;font-weight:900;color:var(--red);line-height:1.15}
+  aside .url{font-size:1.05vw;font-weight:800;word-break:break-all}
+  .dots{display:flex;gap:.5vw;flex-wrap:wrap;justify-content:center}
+  .dots i{width:.8vw;height:.8vw;border-radius:50%;background:var(--dash)}
+  .dots i.on{background:var(--orange)}
+  .msg{grid-column:1/2;display:grid;place-items:center;font-size:2.4vw;font-weight:900;color:var(--muted);background:var(--card);border-radius:1.2vw}
+</style>
+</head>
+<body>
+<div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="tv">
+  <header>
+    <div><div class="eyebrow"><img src="/brand/mark-96.png" alt=""><span id="event"></span></div><h1 id="title">Jump &amp; Speed Contest 🍎</h1></div>
+    <div class="divname" id="divname"></div>
+  </header>
+  <div class="cols" id="cols"></div>
+  <aside>
+    <div class="big">Scan for the live leaderboard</div>
+    <div id="qr"></div>
+    <div class="url" id="url"></div>
+    <div class="dots" id="dots"></div>
+  </aside>
+</div>
+<script src="/js/qrcode.js"></script>
+<script src="/js/tv.js" type="module"></script>
+</body>
+</html>

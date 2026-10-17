@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Results · Cider Run Jump &amp; Speed Contest</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#B3261E">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap">
+<link rel="stylesheet" href="/css/cider.css">
+</head>
+<body>
+<div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<main class="wrap">
+  <section class="card hero" id="hero">
+    <div class="eyebrow"><img src="/brand/mark-96.png" alt="" width="22" height="22"><span id="event">Cider Run Jump &amp; Speed Contest</span></div>
+    <h1 id="name">Loading your results…</h1>
+    <p class="sub" id="div"></p>
+    <div class="live" id="live" role="status" hidden><span class="dot" aria-hidden="true"></span><span id="liveText"></span></div>
+  </section>
+
+  <section class="card pad" id="statsCard" hidden>
+    <div class="stats" id="stats"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <a class="btn small" href="/" id="boardLink">Live leaderboard</a>
+      <button class="btn small ghost" id="share" type="button">Share my results</button>
+    </div>
+  </section>
+
+  <section class="card" id="ppi" hidden>
+    <div class="pad">
+      <h2 style="color:var(--red);font-size:22px">Want the full picture? ⚡</h2>
+      <p style="margin:8px 0 0">Today was two tests. A <strong>Platform Performance Index (PPI)</strong> session measures speed, agility, jumps and strength with timing gates and a force plate, then turns it into a training plan.</p>
+      <a class="btn block" id="ppiLink" href="#" style="margin-top:16px" hidden>Book a PPI session</a>
+      <form id="lead" novalidate style="display:grid;gap:12px;margin-top:16px">
+        <div class="grid2">
+          <label class="field">First name<input id="l_first" autocomplete="given-name" maxlength="40" required></label>
+          <label class="field">Last name<input id="l_last" autocomplete="family-name" maxlength="40"></label>
+          <label class="field">Email<input id="l_email" type="email" autocomplete="email" maxlength="120" required></label>
+          <label class="field">Phone <span class="hint">optional</span><input id="l_phone" type="tel" autocomplete="tel" maxlength="20"></label>
+        </div>
+        <label class="field">Anything we should know? <span class="hint">optional</span><input id="l_note" maxlength="300" placeholder="Sport, goals, upcoming season…"></label>
+        <label class="hp" aria-hidden="true">Leave blank<input id="l_web" tabindex="-1" autocomplete="off"></label>
+        <label class="check"><input type="checkbox" id="l_ok"><span>I'm the athlete or their parent/guardian, and The Platform may contact me by email, phone or text about a PPI session.</span></label>
+        <div class="err" id="l_err" role="alert"></div>
+        <button class="btn red block" id="l_send" type="submit">Request a PPI session</button>
+      </form>
+      <p class="ok" id="l_done" hidden></p>
+    </div>
+  </section>
+</main>
+<footer class="foot">
+  <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="inner">
+    <div class="lock"><img class="m" src="/brand/mark-96.png" alt="" width="38" height="38"><img class="w" src="/brand/wordmark-120.png" alt="The Platform" height="22"></div>
+    <strong style="color:#FFFAF0">The Platform Performance &amp; Sports Rehab</strong><br>
+    8996 W Union Hills Dr, Ste 107, Peoria, AZ<br>
+    <a href="tel:+16023610487">602-361-0487</a> &nbsp;•&nbsp; <a href="https://www.instagram.com/platform.pt/" rel="noopener">@platform.pt</a>
+  </div>
+</footer>
+<script src="/js/result.js" type="module"></script>
+</body>
+</html>

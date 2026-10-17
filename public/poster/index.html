@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Poster · Cider Run Jump &amp; Speed Contest</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap">
+<link rel="stylesheet" href="/css/cider.css">
+<style>
+  body{background:#fff}
+  .sheet{max-width:7.5in;margin:0 auto;padding:.4in .3in;text-align:center}
+  .sheet .stripe{height:14px;border-radius:7px;overflow:hidden;margin-bottom:.35in}
+  .sheet .eyebrow{justify-content:center;font-size:14px}
+  .sheet .eyebrow img{width:30px;height:30px}
+  .sheet h1{font-size:54px;color:var(--red);line-height:1;margin:.15in 0 .1in}
+  .sheet .lede{font-size:24px;font-weight:800;margin:0 0 .25in}
+  .sheet .qr{width:4.6in;max-width:90vw;margin:0 auto;padding:.18in;border:4px dashed var(--dash);border-radius:24px;background:var(--card)}
+  .sheet .qr svg{display:block;width:100%;height:auto}
+  .sheet .url{font-size:22px;font-weight:900;margin-top:.2in;color:var(--orange-ink)}
+  .sheet .steps{font-size:17px;color:var(--muted);margin-top:.12in}
+  .sheet .lock{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:.35in}
+  .sheet .lock img.m{width:44px;height:44px;border-radius:4px}
+  .sheet .lock img.w{height:26px}
+  .print{margin:16px auto 0;display:flex;justify-content:center}
+  @media print{.print{display:none}.sheet{padding-top:.2in} @page{size:letter;margin:.4in}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="eyebrow"><img src="/brand/mark-96.png" alt=""><span>1st Annual Platform Cider Run</span></div>
+  <h1>Jump &amp; Speed Contest 🍎</h1>
+  <p class="lede">Scan to see the live leaderboard</p>
+  <div class="qr" id="qr"></div>
+  <div class="url" id="url"></div>
+  <div class="steps">Open your phone camera and point it at the code. Results update live.</div>
+  <div class="lock"><img class="m" src="/brand/mark-96.png" alt=""><img class="w" src="/brand/wordmark-120.png" alt="The Platform"></div>
+</div>
+<div class="print"><button class="btn" id="print" type="button">Print poster</button></div>
+<script src="/js/qrcode.js"></script>
+<script src="/js/poster.js" type="module"></script>
+</body>
+</html>
