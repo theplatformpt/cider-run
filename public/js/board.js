@@ -56,7 +56,7 @@ function renderChips() {
 function renderSearch(rows) {
   const q = S.q.trim().toLowerCase();
   const hits = rows.filter(r => String(r.b) === q.replace('#', '') || r.n.toLowerCase().includes(q)).slice(0, 20);
-  if (!hits.length) return `<div class="card empty"><b>No one matches “${esc(S.q)}”</b>Check the spelling, or try your bib number.</div>`;
+  if (!hits.length) return `<div class="card empty"><b>No one matches “${esc(S.q)}”</b>Check the spelling, or try your athlete number.</div>`;
   return `<div class="divs">${hits.map(r => `
     <section class="card div">
       <div class="head"><h2>${esc(r.n)} <small>#${r.b}</small></h2><div class="who"><span>${esc(divisionLabel(r.x, r.g))}</span></div></div>

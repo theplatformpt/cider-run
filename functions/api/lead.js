@@ -39,7 +39,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   const bestJ = [a.j1, a.j2, a.j3].filter(v => v !== null);
   const summary = [
     `Cider Run Jump & Speed Contest: PPI session request.`,
-    `Athlete: ${a.first} ${a.last}, age ${a.age}, bib ${a.bib}.`,
+    `Athlete: ${a.first} ${a.last}, age ${a.age}, #${a.bib}.`,
     `Best sprint: ${bestS.length ? Math.min(...bestS).toFixed(2) + ' s' : 'not tested'}. Best jump: ${bestJ.length ? Math.max(...bestJ).toFixed(1) + ' in' : 'not tested'}.`,
     lead.note ? `Note: ${lead.note}` : '',
   ].filter(Boolean).join('\n');

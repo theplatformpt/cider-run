@@ -37,7 +37,7 @@
   <section class="view" id="v-checkin" hidden>
     <div class="card pad" id="ciFormCard">
       <h2>Check in</h2>
-      <p class="lede">Add an athlete and give them a bib. Names show on the board as first name + last initial.</p>
+      <p class="lede">Add an athlete and give them an athlete number. Names show on the board as first name + last initial.</p>
       <form id="ciForm" novalidate style="display:grid;gap:12px">
         <div class="grid2">
           <label class="field">First name<input id="ci_first" autocomplete="off" autocapitalize="words" maxlength="40" required></label>
@@ -46,7 +46,7 @@
         <div class="field">Division<div class="seg" id="ci_sex"><button type="button" data-v="F" aria-pressed="false">Female</button><button type="button" data-v="M" aria-pressed="false">Male</button></div></div>
         <div class="grid2">
           <label class="field">Age<input id="ci_age" type="number" inputmode="numeric" min="2" max="110" required></label>
-          <label class="field">Bib # <span class="hint" id="ci_bibHint">leave blank for next number</span><input id="ci_bib" type="number" inputmode="numeric" min="1"></label>
+          <label class="field">Athlete # <span class="hint" id="ci_bibHint">leave blank for next number</span><input id="ci_bib" type="number" inputmode="numeric" min="1"></label>
         </div>
         <div class="grid2">
           <label class="field">Email <span class="hint">optional</span><input id="ci_email" type="email" autocomplete="off" maxlength="120"></label>
@@ -78,9 +78,9 @@
     <div class="card pad" id="stSearchCard">
       <h2 id="stTitle">Sprint</h2>
       <p class="lede" id="stLede"></p>
-      <label class="search"><span class="sr">Bib number or name</span>
+      <label class="search"><span class="sr">Athlete number or name</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="stq" type="search" placeholder="Bib # or name" autocomplete="off" enterkeyhint="go">
+        <input id="stq" type="search" placeholder="Athlete # or name" autocomplete="off" enterkeyhint="go">
       </label>
       <div class="list" id="stList"></div>
     </div>
@@ -108,10 +108,10 @@
       <p class="lede" id="athCount"></p>
       <label class="search"><span class="sr">Search athletes</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="athq" type="search" placeholder="Bib # or name" autocomplete="off">
+        <input id="athq" type="search" placeholder="Athlete # or name" autocomplete="off">
       </label>
       <div style="overflow-x:auto;margin-top:10px">
-        <table class="tbl"><thead><tr><th>Bib</th><th>Name</th><th>Div</th><th class="num" id="thS">40 yd</th><th class="num">Jump</th></tr></thead><tbody id="athBody"></tbody></table>
+        <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Div</th><th class="num" id="thS">40 yd</th><th class="num">Jump</th></tr></thead><tbody id="athBody"></tbody></table>
       </div>
     </div>
   </section>
@@ -145,7 +145,7 @@
       </form>
 
       <div class="section-t">Import sign-ups</div>
-      <p style="margin:0 0 10px;font-size:14px;color:var(--muted)">CSV with columns for first name, last name, sex (M/F), and age or date of birth. Email, phone and bib are optional. Rows missing sex or age are skipped and listed.</p>
+      <p style="margin:0 0 10px;font-size:14px;color:var(--muted)">CSV with columns for first name, last name, sex (M/F), and age or date of birth. Email, phone and athlete # are optional. Rows missing sex or age are skipped and listed.</p>
       <input type="file" id="impFile" accept=".csv,text/csv">
       <div id="impPreview" style="margin-top:10px;font-size:14px"></div>
       <button class="btn block small" id="impGo" type="button" hidden style="margin-top:10px">Import</button>
@@ -175,7 +175,7 @@
       <label class="field">Last name<input id="ed_last" maxlength="40"></label>
       <label class="field">Sex<select id="ed_sex"><option value="F">Female</option><option value="M">Male</option></select></label>
       <label class="field">Age<input id="ed_age" type="number" inputmode="numeric"></label>
-      <label class="field">Bib #<input id="ed_bib" type="number" inputmode="numeric"></label>
+      <label class="field">Athlete #<input id="ed_bib" type="number" inputmode="numeric"></label>
       <label class="field">Phone<input id="ed_phone" type="tel"></label>
     </div>
     <label class="field">Email<input id="ed_email" type="email"></label>

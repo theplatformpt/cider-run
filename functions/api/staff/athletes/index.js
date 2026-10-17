@@ -19,7 +19,7 @@ export async function onRequestPost({ request, env }) {
     'SELECT bib FROM athletes WHERE lower(first) = lower(?1) AND lower(last) = lower(?2) AND age = ?3'
   ).bind(fields.first, fields.last, fields.age).first();
   if (dup && !body.allowDuplicate) {
-    return error(`${fields.first} ${fields.last} (age ${fields.age}) is already checked in as bib ${dup.bib}.`, 409);
+    return error(`${fields.first} ${fields.last} (age ${fields.age}) is already checked in as #${dup.bib}.`, 409);
   }
 
   const token = newToken();
@@ -53,7 +53,7 @@ export async function onRequestPut({ request, env }) {
     if (bad) { skipped.push({ row: i + 2, reason: bad }); return; }
     const key = `${fields.first.toLowerCase()}|${fields.last.toLowerCase()}|${fields.age}`;
     if (seen.has(key)) { skipped.push({ row: i + 2, reason: `${fields.first} ${fields.last} is already on the list.` }); return; }
-    if (fields.bib && bibs.has(fields.bib)) { skipped.push({ row: i + 2, reason: `Bib ${fields.bib} is already taken.` }); return; }
+    if (fields.bib && bibs.has(fields.bib)) { skipped.push({ row: i + 2, reason: `Athlete #${fields.bib} is already taken.` }); return; }
     seen.add(key);
     let bib = fields.bib;
     if (!bib) { while (bibs.has(nextBib)) nextBib++; bib = nextBib++; }

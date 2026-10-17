@@ -19,7 +19,7 @@ function render() {
   document.title = `${a.name} · ${d.title}`;
   $('#event').textContent = `${d.event} · ${d.title}`;
   $('#name').textContent = a.name;
-  $('#div').textContent = `Bib #${a.bib}${a.division ? ' · ' + a.division : ''}`;
+  $('#div').textContent = `#${a.bib}${a.division ? ' · ' + a.division : ''}`;
   $('#live').hidden = false;
   $('#statsCard').hidden = false;
   const showPlaces = d.open;

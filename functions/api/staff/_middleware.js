@@ -9,7 +9,7 @@ export async function onRequest(ctx) {
     return await ctx.next();
   } catch (e) {
     const msg = String(e && e.message || e);
-    if (/UNIQUE constraint failed: athletes\.bib/.test(msg)) return error('That bib number is already taken.', 409);
+    if (/UNIQUE constraint failed: athletes\.bib/.test(msg)) return error('That athlete number is already taken.', 409);
     return error(msg, 500);
   }
 }

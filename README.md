@@ -25,7 +25,8 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
    - `SESSION_SECRET`: any long random string (keeps staff logins secure).
    - Optional, to send PPI requests straight to GoHighLevel: `GHL_API_KEY` (a Private Integration token) and `GHL_LOCATION_ID` (the sub-account ID). Without these, requests are saved and downloadable from Setup.
 6. **Redeploy** (Deployments → latest → Retry deployment). Secrets and bindings only take effect on a new deploy.
-7. **Domain.** Pages project → Custom domains → add `cider.theplatformpt.com`. In Hostinger DNS add the CNAME record Cloudflare shows (`cider` → `cider-run.pages.dev`), same as the knee site.
+7. **Domain.** (Any visit to `cider-run.pages.dev` now forwards to the custom domain automatically.)
+    Pages project → Custom domains → add `cider.theplatformpt.com`. In Hostinger DNS add the CNAME record Cloudflare shows (`cider` → `cider-run.pages.dev`), same as the knee site.
 
 ## Before the event
 
@@ -37,8 +38,8 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
 
 ## On the day
 
-- **Check-in table:** Check in tab. Bib numbers are assigned automatically (or type your own). The screen shows a QR the athlete scans to follow their own results.
-- **Sprint station / Jump station:** type the bib, press Enter, type trial 1, Enter, trial 2, Enter… Enter on an empty box saves. Only trial 1 is required. Sprint and jump can be entered on different phones at the same time for the same athlete without overwriting each other.
+- **Check-in table:** Check in tab. Each athlete gets an athlete number automatically (or type your own). It's only a lookup number: write it on their hand or a name sticker so stations can find them fast. No race bibs needed. The screen shows a QR the athlete scans to follow their own results.
+- **Sprint station / Jump station:** type the athlete # (or name), press Enter, type trial 1, Enter, trial 2, Enter… Enter on an empty box saves. Only trial 1 is required. Sprint and jump can be entered on different phones at the same time for the same athlete without overwriting each other.
 - **Mistakes:** Athletes tab → tap the row → fix any trial, name, age or sex → Save. Delete is there too.
 - **After:** Setup → Results CSV (every trial, best marks, placings, contact info, results links) and PPI requests CSV.
 
@@ -48,7 +49,7 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
 - Divisions are age group × sex. Default groups: 10 & under, 11–13, 14–17, 18–34, 35–49, 50+.
 - Places use competition ranking: a tie shares a place (1, 2, 2, 4).
 - Overall = average of the athlete's sprint and jump percentile within their division (share of the division they beat, ties count half; a division of one gets 100). Needs both tests. Public pages show the overall **place** only, never the number, so last place never reads as "0". The number is in the staff Results CSV.
-- Public pages show first name + last initial and bib only. Emails, phones and results links are staff-only.
+- Public pages show first name + last initial and athlete # only. Emails, phones and results links are staff-only.
 
 ## Capacity
 

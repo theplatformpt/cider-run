@@ -8,10 +8,12 @@ export async function onRequestGet({ request, env }) {
   const { results } = await db(env).prepare(`SELECT ${ATHLETE_COLS} FROM athletes ORDER BY bib`).all();
   const s = await loadSettings(env);
   const board = computeBoard(results, s, 0);
-  const origin = new URL(request.url).origin;
+  const u = new URL(request.url);
+  const origin = u.hostname.endsWith('.pages.dev') || u.hostname === '127.0.0.1' || u.hostname === 'localhost'
+    ? `https://${env.CANONICAL_HOST && env.CANONICAL_HOST !== 'off' ? env.CANONICAL_HOST : 'cider.theplatformpt.com'}` : u.origin;
   const y = s.sprintYards;
   const rows = [[
-    'Bib', 'First', 'Last', 'Sex', 'Age', 'Age group', 'Email', 'Phone',
+    'Athlete #', 'First', 'Last', 'Sex', 'Age', 'Age group', 'Email', 'Phone',
     `${y} yd trial 1 (s)`, `${y} yd trial 2 (s)`, `${y} yd trial 3 (s)`, `Best ${y} yd (s)`, 'Sprint place', 'Sprint percentile',
     'Jump trial 1 (in)', 'Jump trial 2 (in)', 'Jump trial 3 (in)', 'Best jump (in)', 'Jump place', 'Jump percentile',
     'Overall score', 'Overall place', 'Results link', 'Checked in',

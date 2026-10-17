@@ -123,7 +123,7 @@ async function checkIn(body) {
     const d = await call('/api/staff/athletes', { method: 'POST', body });
     upsertLocal(d.athlete);
     $('#ciFormCard').hidden = true; $('#ciDone').hidden = false;
-    $('#ciDoneBib').textContent = `Bib ${d.athlete.bib}`;
+    $('#ciDoneBib').textContent = `Athlete #${d.athlete.bib}`;
     $('#ciDoneName').textContent = `${fullName(d.athlete)} · ${divOf(d.athlete)}`;
     $('#ciDoneQr').innerHTML = qrSvg(`${location.origin}/r/${d.athlete.token}`);
     S.lastCheckedIn = d.athlete;
@@ -258,7 +258,7 @@ $('#stQr').addEventListener('click', () => S.current && showQr(S.current));
 /* ---------- QR dialog ---------- */
 function showQr(a) {
   const url = `${location.origin}/r/${a.token}`;
-  $('#qrName').textContent = `${fullName(a)} · Bib ${a.bib}`;
+  $('#qrName').textContent = `${fullName(a)} · #${a.bib}`;
   $('#qrBox').innerHTML = qrSvg(url);
   $('#qrLink').href = url; $('#qrLink').textContent = url;
   $('#qrDlg').showModal();
@@ -284,7 +284,7 @@ $('#athBody').addEventListener('click', e => { const r = e.target.closest('[data
 function openEdit(id) {
   const a = S.athletes.find(x => x.id === id); if (!a) return;
   S.editing = a;
-  $('#editTitle').textContent = `Bib ${a.bib} · ${fullName(a)}`;
+  $('#editTitle').textContent = `#${a.bib} · ${fullName(a)}`;
   for (const k of ['first', 'last', 'sex', 'age', 'bib', 'phone', 'email']) $(`#ed_${k}`).value = a[k] ?? '';
   $('#edSLabel').textContent = `${yards()}-yd sprint trials (s)`;
   $('#ed_s').innerHTML = [0, 1, 2].map(i => `<label>Trial ${i + 1}<input data-s="${i}" inputmode="decimal" value="${a.s[i] ?? ''}"></label>`).join('');
@@ -309,7 +309,7 @@ $('#edSave').addEventListener('click', async () => {
 });
 $('#edDel').addEventListener('click', async () => {
   const a = S.editing;
-  if (!confirm(`Delete ${fullName(a)} (bib ${a.bib}) and all their results? This can't be undone.`)) return;
+  if (!confirm(`Delete ${fullName(a)} (#${a.bib}) and all their results? This can't be undone.`)) return;
   try {
     await call(`/api/staff/athletes/${a.id}`, { method: 'DELETE', body: {} });
     S.athletes = S.athletes.filter(x => x.id !== a.id); $('#editDlg').close(); renderAthletes(); toast('Deleted');
@@ -393,7 +393,7 @@ function mapRows(rows) {
   const iF = find('first', 'firstname', 'athletefirstname', 'givenname'), iL = find('last', 'lastname', 'athletelastname', 'surname', 'familyname');
   const iN = find('name', 'fullname', 'athlete', 'athletename');
   const iS = find('sex', 'gender', 'mf', 'division'), iA = find('age', 'athleteage', 'ageonraceday');
-  const iD = find('dob', 'dateofbirth', 'birthday', 'birthdate'), iE = find('email', 'emailaddress'), iP = find('phone', 'phonenumber', 'mobile', 'cell'), iB = find('bib', 'bibnumber');
+  const iD = find('dob', 'dateofbirth', 'birthday', 'birthdate'), iE = find('email', 'emailaddress'), iP = find('phone', 'phonenumber', 'mobile', 'cell'), iB = find('bib', 'bibnumber', 'athletenumber', 'number');
   const sexOf = v => { v = String(v || '').trim().toLowerCase(); return /^(m|male|man|boy|boys|men)$/.test(v) ? 'M' : /^(f|female|woman|girl|girls|women)$/.test(v) ? 'F' : ''; };
   return rows.slice(1).map(r => {
     let first = iF >= 0 ? r[iF] : '', last = iL >= 0 ? r[iL] : '';
