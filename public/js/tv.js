@@ -1,4 +1,4 @@
-import { $, esc, fmtS, fmtJ, poll, qrSvg } from './common.js';
+import { $, esc, fmtS, fmtJ, fmtM, poll, qrSvg } from './common.js';
 let data = null, rev = null, idx = 0;
 $('#qr').innerHTML = qrSvg(location.origin + '/');
 $('#url').textContent = location.host;
@@ -7,12 +7,12 @@ function divisions() {
   const out = [];
   if (!data) return out;
   data.groups.forEach((g, gi) => ['F', 'M'].forEach(x => {
-    if (data.rows.some(r => r.g === gi && r.x === x && (r.s !== null || r.j !== null))) out.push({ g: gi, x });
+    if (data.rows.some(r => r.g === gi && r.x === x && (r.s !== null || r.j !== null || r.m != null))) out.push({ g: gi, x });
   }));
   return out;
 }
 function col(title, list, vk, rk, fmt, unit) {
-  const top = list.filter(r => r[vk] !== null).sort((a, b) => a[rk] - b[rk] || a.n.localeCompare(b.n)).slice(0, 6);
+  const top = list.filter(r => r[vk] != null).sort((a, b) => a[rk] - b[rk] || a.n.localeCompare(b.n)).slice(0, 6);
   return `<section class="col"><h2>${title}</h2><ol>${top.map(r => `<li><span class="badge ${r[rk] <= 3 ? 'p' + r[rk] : ''}">${r[rk]}</span><b>${esc(r.n)}</b><span class="v">${fmt(r[vk], r)}${unit ? `<small> ${unit}</small>` : ''}</span></li>`).join('') || '<li class="none">No results yet</li>'}</ol></section>`;
 }
 function show() {
@@ -29,7 +29,10 @@ function show() {
   const { g, x } = divs[idx];
   const list = data.rows.filter(r => r.g === g && r.x === x);
   $('#divname').innerHTML = `<small>Division ${idx + 1} of ${divs.length}</small>${x === 'M' ? 'Male' : 'Female'} ${esc(data.groups[g])}`;
-  $('#cols').innerHTML = col(`${data.yards}-yd dash`, list, 's', 'sr', fmtS, 's') + col('Vertical jump', list, 'j', 'jr', fmtJ, 'in') + col('Overall', list, 'o', 'or', (_, r) => `<span class="sm">${fmtS(r.s)} s · ${fmtJ(r.j)} in</span>`, '');
+  const four = !!data.counts.mile;
+  $('#cols').innerHTML = col(`${data.yards}-yd dash`, list, 's', 'sr', fmtS, 's') + col('Vertical jump', list, 'j', 'jr', fmtJ, 'in') + col('Overall', list, 'o', 'or', (_, r) => (four ? '' : `<span class="sm">${fmtS(r.s)} s · ${fmtJ(r.j)} in</span>`), '')
+    + (four ? col('Mile', list, 'm', 'mr', fmtM, '') : '');
+  document.body.classList.toggle('four', four);
   $('#dots').innerHTML = divs.map((_, i) => `<i class="${i === idx ? 'on' : ''}"></i>`).join('');
 }
 poll(async () => {

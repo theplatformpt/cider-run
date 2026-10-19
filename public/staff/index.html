@@ -111,7 +111,7 @@
         <input id="athq" type="search" placeholder="Athlete # or name" autocomplete="off">
       </label>
       <div style="overflow-x:auto;margin-top:10px">
-        <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Div</th><th class="num" id="thS">40 yd</th><th class="num">Jump</th></tr></thead><tbody id="athBody"></tbody></table>
+        <table class="tbl"><thead><tr><th>#</th><th>Name</th><th>Div</th><th class="num" id="thS">40 yd</th><th class="num">Jump</th><th class="num">Mile</th></tr></thead><tbody id="athBody"></tbody></table>
       </div>
     </div>
   </section>
@@ -181,6 +181,7 @@
     <label class="field">Email<input id="ed_email" type="email"></label>
     <div class="field"><span id="edSLabel">Sprint trials (s)</span><div class="trials" style="margin-top:0" id="ed_s"></div></div>
     <div class="field">Jump trials (in)<div class="trials" style="margin-top:0" id="ed_j"></div></div>
+    <label class="field">Mile time <span class="hint">min:sec, e.g. 7:42. Leave blank if they didn't run it.</span><input id="ed_mile" inputmode="decimal" autocomplete="off"></label>
     <div class="err" id="edErr" role="alert"></div>
     <div class="row" style="margin-top:0">
       <button class="btn red" id="edSave" type="button">Save</button>
@@ -207,6 +208,7 @@
   <button data-view="checkin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M3 21c0-4 3-6 7-6s7 2 7 6M19 8v6M16 11h6"/></svg>Check in</button>
   <button data-view="sprint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M10 2h4"/></svg>Sprint</button>
   <button data-view="jump"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V5M6 11l6-6 6 6M4 22h16"/></svg>Jump</button>
+  <button data-view="mile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Mile</button>
   <button data-view="athletes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Athletes</button>
   <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Setup</button>
 </div></nav>

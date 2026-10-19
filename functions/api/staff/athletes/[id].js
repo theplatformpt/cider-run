@@ -4,7 +4,7 @@ import { cleanAthlete, publicAthlete } from '../../../../lib/athletes.js';
 import { rebuild } from '../../../../lib/board.js';
 import { standingFor } from '../../../../lib/standing.js';
 
-const EDITABLE = ['bib', 'first', 'last', 'sex', 'age', 'email', 'phone', 's1', 's2', 's3', 'j1', 'j2', 'j3'];
+const EDITABLE = ['bib', 'first', 'last', 'sex', 'age', 'email', 'phone', 's1', 's2', 's3', 'j1', 'j2', 'j3', 'mile'];
 
 function idOf(params) {
   const id = Number(params.id);

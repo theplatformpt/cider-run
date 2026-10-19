@@ -14,6 +14,24 @@ export function ordinal(n) {
 
 export const fmtS = v => (v === null || v === undefined ? '' : Number(v).toFixed(2));
 export const fmtJ = v => (v === null || v === undefined ? '' : Number(v).toFixed(1));
+export const fmtM = v => {
+  if (v === null || v === undefined) return '';
+  const t = Math.round(v), m = Math.floor(t / 60), s = t % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+};
+// Staff typing a mile time: "7:42", "7.42" (minutes.seconds) or "742" all mean 7:42.
+// Returns seconds, null for blank, or NaN when it can't be read.
+export function parseMile(raw) {
+  const v = String(raw ?? '').trim();
+  if (!v) return null;
+  let m, s;
+  let x = v.match(/^(\d{1,2})\s*[:.,;']\s*(\d{1,2})$/);
+  if (x) { if (x[2].length !== 2) return NaN; m = +x[1]; s = +x[2]; }   // "7.5" is ambiguous (7:05? 7:30? 7:50?), so seconds need 2 digits
+  else if (/^\d{3,4}$/.test(v)) { m = +v.slice(0, -2); s = +v.slice(-2); }
+  else return NaN;
+  if (s > 59) return NaN;
+  return m * 60 + s;
+}
 export const fmtO = v => (v === null || v === undefined ? '' : Number(v).toFixed(1));
 
 export function ago(iso) {

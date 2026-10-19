@@ -1,4 +1,5 @@
 import { $, $$, esc, ordinal, fmtS, fmtJ, api, toast, qrSvg } from './common.js';
+import { fmtM, parseMile } from './common.js';
 
 const EVENT_DATE = new Date('2026-11-21T12:00:00-07:00'); // for ages from a date of birth in imports
 const S = {
@@ -86,16 +87,16 @@ function search(q) {
 
 /* ---------- navigation ---------- */
 function go(view) {
-  if (!['checkin', 'sprint', 'jump', 'athletes', 'settings'].includes(view)) view = 'checkin';
-  if (S.view && (S.view === 'sprint' || S.view === 'jump') && dirty() && !confirm('You have results that are not saved. Leave without saving?')) return;
+  if (!['checkin', 'sprint', 'jump', 'mile', 'athletes', 'settings'].includes(view)) view = 'checkin';
+  if (S.view && T[S.view] && dirty() && !confirm('You have results that are not saved. Leave without saving?')) return;
   S.view = view;
   try { localStorage.setItem('cider_station', view); } catch { /* private mode */ }
   $$('#nav [data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === view ? 'page' : 'false'));
   $$('.view').forEach(v => { v.hidden = true; });
-  const names = { checkin: 'Check-in', sprint: `${yards()}-yd sprint`, jump: 'Vertical jump', athletes: 'Athletes', settings: 'Setup' };
+  const names = { checkin: 'Check-in', sprint: `${yards()}-yd sprint`, jump: 'Vertical jump', mile: 'Mile', athletes: 'Athletes', settings: 'Setup' };
   $('#stationName').textContent = names[view];
   if (view === 'checkin') { $('#v-checkin').hidden = false; resetCheckin(); }
-  if (view === 'sprint' || view === 'jump') { $('#v-station').hidden = false; openStation(view); }
+  if (T[view]) { $('#v-station').hidden = false; openStation(view); }
   if (view === 'athletes') { $('#v-athletes').hidden = false; loadAthletes().then(renderAthletes); renderAthletes(); }
   if (view === 'settings') { $('#v-settings').hidden = false; loadSettings().then(renderSettings); renderSettings(); }
   window.scrollTo(0, 0);
@@ -150,18 +151,26 @@ $('#ciNext').addEventListener('click', resetCheckin);
 const T = {
   sprint: { key: 's', unit: 's', fmt: fmtS, low: true, step: '0.01', plaus: () => [yards() * 0.095, yards() * 0.4] },
   jump: { key: 'j', unit: 'in', fmt: fmtJ, low: false, step: '0.1', plaus: () => [2, 45] },
+  mile: { key: 'mile', single: true, unit: '', fmt: fmtM, low: true, plaus: () => [270, 1800] },
 };
+// The athlete's saved values for a station, always as a list.
+const valuesOf = (a, t) => (t.single ? [a[t.key] ?? null] : a[t.key]);
 
 function openStation(view) {
   const t = T[view];
-  $('#stTitle').textContent = view === 'sprint' ? `${yards()}-yd sprint` : 'Vertical jump';
-  $('#stLede').textContent = view === 'sprint'
-    ? 'Find the athlete, enter each trial in seconds. Best (lowest) time counts.'
-    : 'Find the athlete, enter each trial in inches. Best (highest) jump counts.';
-  $('#stUnit').textContent = view === 'sprint' ? 'Seconds, e.g. 5.42. Trial 1 is required, 2 and 3 are optional.' : 'Inches, e.g. 22.5. Trial 1 is required, 2 and 3 are optional.';
-  $('#stTrials').innerHTML = [1, 2, 3].map(i => `<label>Trial ${i}<input id="tr${i}" inputmode="decimal" step="${t.step}" autocomplete="off" enterkeyhint="${i < 3 ? 'next' : 'done'}"></label>`).join('');
+  $('#stTitle').textContent = { sprint: `${yards()}-yd sprint`, jump: 'Vertical jump', mile: 'Mile' }[view];
+  $('#stLede').textContent = {
+    sprint: 'Find the athlete, enter each trial in seconds. Best (lowest) time counts.',
+    jump: 'Find the athlete, enter each trial in inches. Best (highest) jump counts.',
+    mile: 'Find the runner, enter their finish time. Only people who ran the mile need one.',
+  }[view];
+  $('#stTrials').classList.toggle('one', !!t.single);
+  $('#stTrials').innerHTML = t.single
+    ? `<label>Finish time (min:sec)<input id="tr1" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="7:42"></label>`
+    : [1, 2, 3].map(i => `<label>Trial ${i}<input id="tr${i}" inputmode="decimal" step="${t.step}" autocomplete="off" enterkeyhint="${i < 3 ? 'next' : 'done'}"></label>`).join('');
+  setUnitHint();
   $$('#stTrials input').forEach((inp, i, all) => {
-    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (i < 2 && !all[i + 1].value) all[i + 1].focus(); else saveTrials(); } });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (i < all.length - 1 && !all[i + 1].value) all[i + 1].focus(); else saveTrials(); } });
     inp.addEventListener('input', markBest);
   });
   closePanel();
@@ -172,10 +181,10 @@ function renderPicks() {
   const view = S.view, t = T[view];
   const hits = search($('#stq').value);
   $('#stList').innerHTML = hits.map(a => {
-    const b = bestOf(a[t.key], t.low);
+    const b = bestOf(valuesOf(a, t), t.low);
     return `<button class="pick" data-pick="${a.id}"><span class="bib">${a.bib}</span>
       <span><span class="nm">${esc(fullName(a))}</span><br><span class="meta">${esc(divOf(a))}</span></span>
-      <span class="done">${b !== null ? `✓ ${t.fmt(b)} ${t.unit}` : ''}</span></button>`;
+      <span class="done">${b !== null ? `✓ ${t.fmt(b)}${t.unit ? ' ' + t.unit : ''}` : ''}</span></button>`;
   }).join('') || ($('#stq').value.trim() ? `<p style="color:var(--muted)">No match. Check them in first on the Check in tab.</p>` : '');
 }
 $('#stq').addEventListener('input', renderPicks);
@@ -187,7 +196,7 @@ $('#stq').addEventListener('keydown', e => {
 });
 $('#stList').addEventListener('click', e => { const p = e.target.closest('[data-pick]'); if (p) openAthlete(Number(p.dataset.pick)); });
 
-function trialInputs() { return [1, 2, 3].map(i => $(`#tr${i}`)); }
+function trialInputs() { return $$('#stTrials input'); }
 function currentValues() { return trialInputs().map(i => i.value.trim()); }
 function dirty() { return !!S.current && !$('#stPanel').hidden && JSON.stringify(currentValues()) !== JSON.stringify(S.saved); }
 
@@ -199,7 +208,7 @@ async function openAthlete(id) {
   S.current = a;
   $('#stSearchCard').hidden = true; $('#stPanel').hidden = false;
   $('#stBib').textContent = a.bib; $('#stName').textContent = fullName(a); $('#stDiv').textContent = `${divOf(a)} · age ${a.age}`;
-  trialInputs().forEach((inp, i) => { inp.value = a[t.key][i] ?? ''; });
+  trialInputs().forEach((inp, i) => { const v = valuesOf(a, t)[i]; inp.value = v === null || v === undefined ? '' : t.single ? t.fmt(v) : v; });
   S.saved = currentValues();
   $('#stErr').textContent = ''; $('#stStanding').hidden = true;
   markBest();
@@ -207,8 +216,20 @@ async function openAthlete(id) {
   firstEmpty.focus();
 }
 
+function setUnitHint() {
+  const t = T[S.view]; if (!t) return;
+  if (!t.single) {
+    $('#stUnit').textContent = S.view === 'sprint' ? 'Seconds, e.g. 5.42. Trial 1 is required, 2 and 3 are optional.' : 'Inches, e.g. 22.5. Trial 1 is required, 2 and 3 are optional.';
+    return;
+  }
+  const inp = $('#tr1'), v = inp ? parseMile(inp.value) : null;
+  $('#stUnit').textContent = v === null ? 'Type 7:42, 7.42 or 742. All mean 7 minutes 42 seconds.'
+    : Number.isNaN(v) ? "Can't read that. Use 2 digits for seconds: 7:05, not 7:5." : `= ${Math.floor(v / 60)} min ${v % 60} sec`;
+}
+
 function markBest() {
   const t = T[S.view]; if (!t) return;
+  if (t.single) { setUnitHint(); return; }
   const vals = trialInputs().map(i => (i.value.trim() === '' ? null : Number(i.value.replace(',', '.'))));
   const b = bestOf(vals.filter(Number.isFinite), t.low);
   trialInputs().forEach((inp, i) => inp.classList.toggle('best', b !== null && vals[i] === b));
@@ -219,9 +240,31 @@ function closePanel() {
   $('#stPanel').hidden = true; $('#stSearchCard').hidden = false;
 }
 
+async function saveMile(a, t) {
+  const sec = parseMile($('#tr1').value);
+  if (Number.isNaN(sec)) { $('#stErr').textContent = "Can't read that time. Type it like 7:42."; return; }
+  if (sec !== null && (sec < 180 || sec > 3600)) { $('#stErr').textContent = 'Mile time must be between 3:00 and 60:00.'; return; }
+  const [lo, hi] = t.plaus();
+  if (sec !== null && (sec < lo || sec > hi) && !confirm(`${fmtM(sec)} looks unusual for a mile. Save anyway?`)) return;
+  const btn = $('#stSave'); btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const d = await call(`/api/staff/athletes/${a.id}`, { method: 'PATCH', body: { mile: sec } });
+    upsertLocal(d.athlete); S.current = d.athlete;
+    $('#tr1').value = sec === null ? '' : fmtM(sec); S.saved = currentValues(); setUnitHint();
+    const st = d.standing;
+    $('#stErr').textContent = '';
+    $('#stStanding').hidden = false;
+    $('#stStanding').textContent = sec === null ? 'Saved. Mile time cleared.' : `Saved. Mile ${fmtM(st.m)}: ${ordinal(st.mr)} of ${st.mn} in ${st.division}.`;
+    toast('Saved ✓');
+  } catch (x) {
+    $('#stErr').textContent = x.message;
+  } finally { btn.disabled = false; btn.textContent = 'Save'; }
+}
+
 async function saveTrials() {
   const a = S.current; if (!a) return;
   const t = T[S.view];
+  if (t.single) return saveMile(a, t);
   const raw = currentValues();
   const vals = raw.map(v => (v === '' ? null : Number(v.replace(',', '.'))));
   if (vals.some((v, i) => raw[i] !== '' && !Number.isFinite(v))) { $('#stErr').textContent = 'Only numbers, please.'; return; }
@@ -270,13 +313,13 @@ function renderAthletes() {
   $('#thS').textContent = `${yards()} yd`;
   const q = $('#athq').value.trim();
   const list = q ? search(q).concat([]) : S.athletes;
-  const nS = S.athletes.filter(a => bestOf(a.s, true) !== null).length, nJ = S.athletes.filter(a => bestOf(a.j, false) !== null).length;
-  $('#athCount').textContent = `${S.athletes.length} checked in · ${nS} sprinted · ${nJ} jumped. Tap a row to edit or fix a result.`;
+  const nS = S.athletes.filter(a => bestOf(a.s, true) !== null).length, nJ = S.athletes.filter(a => bestOf(a.j, false) !== null).length, nM = S.athletes.filter(a => a.mile != null).length;
+  $('#athCount').textContent = `${S.athletes.length} checked in · ${nS} sprinted · ${nJ} jumped · ${nM} ran the mile. Tap a row to edit or fix a result.`;
   $('#athBody').innerHTML = list.map(a => {
     const bs = bestOf(a.s, true), bj = bestOf(a.j, false);
     return `<tr class="click" data-edit="${a.id}"><td><b>${a.bib}</b></td><td>${esc(fullName(a))}</td><td>${esc(divOf(a))}</td>
-      <td class="num">${bs !== null ? fmtS(bs) : '–'}</td><td class="num">${bj !== null ? fmtJ(bj) : '–'}</td></tr>`;
-  }).join('') || '<tr><td colspan="5" style="color:var(--muted)">No athletes yet.</td></tr>';
+      <td class="num">${bs !== null ? fmtS(bs) : '–'}</td><td class="num">${bj !== null ? fmtJ(bj) : '–'}</td><td class="num">${a.mile != null ? fmtM(a.mile) : '–'}</td></tr>`;
+  }).join('') || '<tr><td colspan="6" style="color:var(--muted)">No athletes yet.</td></tr>';
 }
 $('#athq').addEventListener('input', renderAthletes);
 $('#athBody').addEventListener('click', e => { const r = e.target.closest('[data-edit]'); if (r) openEdit(Number(r.dataset.edit)); });
@@ -289,6 +332,7 @@ function openEdit(id) {
   $('#edSLabel').textContent = `${yards()}-yd sprint trials (s)`;
   $('#ed_s').innerHTML = [0, 1, 2].map(i => `<label>Trial ${i + 1}<input data-s="${i}" inputmode="decimal" value="${a.s[i] ?? ''}"></label>`).join('');
   $('#ed_j').innerHTML = [0, 1, 2].map(i => `<label>Trial ${i + 1}<input data-j="${i}" inputmode="decimal" value="${a.j[i] ?? ''}"></label>`).join('');
+  $('#ed_mile').value = a.mile != null ? fmtM(a.mile) : '';
   $('#edErr').textContent = '';
   $('#editDlg').showModal();
 }
@@ -301,7 +345,9 @@ $('#edSave').addEventListener('click', async () => {
     first: $('#ed_first').value, last: $('#ed_last').value, sex: $('#ed_sex').value, age: Number($('#ed_age').value),
     bib: $('#ed_bib').value === '' ? a.bib : Number($('#ed_bib').value), phone: $('#ed_phone').value, email: $('#ed_email').value,
     s: $$('#ed_s input').map(i => num(i.value)), j: $$('#ed_j input').map(i => num(i.value)),
+    mile: parseMile($('#ed_mile').value),
   };
+  if (Number.isNaN(body.mile)) { $('#edErr').textContent = "Can't read the mile time. Type it like 7:42."; return; }
   try {
     const d = await call(`/api/staff/athletes/${a.id}`, { method: 'PATCH', body });
     upsertLocal(d.athlete); $('#editDlg').close(); renderAthletes(); toast('Saved ✓');
@@ -423,7 +469,7 @@ $('#impGo').addEventListener('click', async () => {
 });
 
 /* keep station lists fresh when two people check athletes in */
-setInterval(() => { if (!document.hidden && (S.view === 'sprint' || S.view === 'jump') && $('#stPanel').hidden) loadAthletes().then(renderPicks).catch(() => {}); }, 15000);
+setInterval(() => { if (!document.hidden && T[S.view] && $('#stPanel').hidden) loadAthletes().then(renderPicks).catch(() => {}); }, 15000);
 window.addEventListener('beforeunload', e => { if (dirty()) { e.preventDefault(); e.returnValue = ''; } });
 
 boot();

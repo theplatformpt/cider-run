@@ -7,7 +7,7 @@ export async function onRequestGet({ env, params }) {
   if (!/^[a-f0-9]{24}$/.test(token)) return error('Results link not found.', 404);
   const D = db(env);
   const [a, snap] = await D.batch([
-    D.prepare('SELECT bib, first, last, s1, s2, s3, j1, j2, j3 FROM athletes WHERE token = ?').bind(token),
+    D.prepare('SELECT bib, first, last, s1, s2, s3, j1, j2, j3, mile FROM athletes WHERE token = ?').bind(token),
     D.prepare('SELECT body FROM snapshot WHERE id = 1'),
   ]);
   const row = a.results[0];
@@ -26,6 +26,7 @@ export async function onRequestGet({ env, params }) {
       sprint: { trials: [row.s1, row.s2, row.s3], best: me?.s ?? null, place: me?.sr ?? null, of: size.s || 0, pct: me?.sp ?? null },
       jump:   { trials: [row.j1, row.j2, row.j3], best: me?.j ?? null, place: me?.jr ?? null, of: size.j || 0, pct: me?.jp ?? null },
       overall: { score: me?.o ?? null, place: me?.or ?? null, of: size.o || 0 },
+      mile: { time: row.mile ?? null, place: me?.mr ?? null, of: size.m || 0 },
     },
   });
 }

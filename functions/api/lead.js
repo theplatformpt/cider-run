@@ -1,5 +1,6 @@
 import { json, error, db, readJson, isTrustedWrite } from '../../lib/http.js';
 import { sendToGhl } from '../../lib/ghl.js';
+import { fmtMile } from '../../lib/scoring.js';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const clip = (v, n) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
@@ -22,7 +23,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   const D = db(env);
   const token = String(b.token || '');
   const a = /^[a-f0-9]{24}$/.test(token)
-    ? await D.prepare('SELECT id, bib, first, last, age, s1, s2, s3, j1, j2, j3 FROM athletes WHERE token = ?').bind(token).first()
+    ? await D.prepare('SELECT id, bib, first, last, age, s1, s2, s3, j1, j2, j3, mile FROM athletes WHERE token = ?').bind(token).first()
     : null;
   if (!a) return error('Results link not found.', 404);
 
@@ -41,6 +42,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     `Cider Run Jump & Speed Contest: PPI session request.`,
     `Athlete: ${a.first} ${a.last}, age ${a.age}, #${a.bib}.`,
     `Best sprint: ${bestS.length ? Math.min(...bestS).toFixed(2) + ' s' : 'not tested'}. Best jump: ${bestJ.length ? Math.max(...bestJ).toFixed(1) + ' in' : 'not tested'}.`,
+    a.mile !== null && a.mile !== undefined ? `Mile: ${fmtMile(a.mile)}.` : '',
     lead.note ? `Note: ${lead.note}` : '',
   ].filter(Boolean).join('\n');
 

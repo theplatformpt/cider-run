@@ -1,16 +1,16 @@
-import { $, $$, esc, ordinal, fmtS, fmtJ, ago, poll } from './common.js';
+import { $, $$, esc, ordinal, fmtS, fmtJ, fmtM, ago, poll } from './common.js';
 
 const params = new URLSearchParams(location.search);
 const S = {
   data: null, rev: null, ok: true,
-  tab: ['o', 's', 'j'].includes(params.get('tab')) ? params.get('tab') : 'o',
+  tab: ['o', 's', 'j', 'm'].includes(params.get('tab')) ? params.get('tab') : 'o',
   x: ['A', 'M', 'F'].includes(params.get('x')) ? params.get('x') : 'A',
   g: params.has('g') ? Number(params.get('g')) : -1,
   q: '',
   me: (() => { try { return Number(localStorage.getItem('cider_me')) || null; } catch { return null; } })(),
 };
 
-const KEY = { s: ['s', 'sr'], j: ['j', 'jr'], o: ['o', 'or'] };
+const KEY = { s: ['s', 'sr'], j: ['j', 'jr'], o: ['o', 'or'], m: ['m', 'mr'] };
 
 function saveUrl() {
   const p = new URLSearchParams();
@@ -23,6 +23,7 @@ function saveUrl() {
 function value(r, tab) {
   if (tab === 's') return `${fmtS(r.s)}<small>s</small>`;
   if (tab === 'j') return `${fmtJ(r.j)}<small>in</small>`;
+  if (tab === 'm') return `${fmtM(r.m)}`;
   // Overall shows place only (the badge) plus the athlete's two marks, never a score.
   return `<span class="pair">${fmtS(r.s)}<small>s</small><br>${fmtJ(r.j)}<small>in</small></span>`;
 }
@@ -64,6 +65,7 @@ function renderSearch(rows) {
         <li><span class="badge ${r.sr && r.sr <= 3 ? 'p' + r.sr : ''}">${r.sr ?? '–'}</span><span class="who"><b>${S.data.yards}-yd dash</b><span>${r.sr ? ordinal(r.sr) + ' in division' : 'Not tested yet'}</span></span><span class="val">${r.s !== null ? value(r, 's') : '–'}</span></li>
         <li><span class="badge ${r.jr && r.jr <= 3 ? 'p' + r.jr : ''}">${r.jr ?? '–'}</span><span class="who"><b>Vertical jump</b><span>${r.jr ? ordinal(r.jr) + ' in division' : 'Not tested yet'}</span></span><span class="val">${r.j !== null ? value(r, 'j') : '–'}</span></li>
         <li><span class="badge ${r.or && r.or <= 3 ? 'p' + r.or : ''}">${r.or ?? '–'}</span><span class="who"><b>Overall</b><span>${r.or ? ordinal(r.or) + ' in division' : 'Needs both tests'}</span></span><span class="val">${r.or ? ordinal(r.or) : '–'}</span></li>
+        ${r.m !== null && r.m !== undefined ? `<li><span class="badge ${r.mr <= 3 ? 'p' + r.mr : ''}">${r.mr}</span><span class="who"><b>Mile</b><span>${ordinal(r.mr)} in division</span></span><span class="val">${fmtM(r.m)}</span></li>` : ''}
       </ol>
       <button class="more" data-follow="${r.b}">${r.b === S.me ? '★ Highlighted on the board' : 'Highlight me on the board'}</button>
     </section>`).join('')}</div>`;
@@ -74,9 +76,9 @@ function render() {
   if (!d) return;
   $('#event').textContent = d.event;
   $('#title').textContent = d.title;
-  $('#sprintTab').textContent = `${d.yards}-Yd Dash`;
+  $('#sprintTab').textContent = `${d.yards} Yd`;
   $('#counts').innerHTML = d.open
-    ? `<span><b>${d.counts.athletes}</b> athletes</span><span><b>${d.counts.sprint}</b> sprinted</span><span><b>${d.counts.jump}</b> jumped</span>`
+    ? `<span><b>${d.counts.athletes}</b> athletes</span><span><b>${d.counts.sprint}</b> sprinted</span><span><b>${d.counts.jump}</b> jumped</span>${d.counts.mile ? `<span><b>${d.counts.mile}</b> ran the mile</span>` : ''}`
     : '';
   renderChips();
 
@@ -93,13 +95,13 @@ function render() {
     if (S.g >= 0 && g !== S.g) continue;
     for (const x of ['F', 'M']) {
       if (S.x !== 'A' && x !== S.x) continue;
-      const list = d.rows.filter(r => r.g === g && r.x === x && r[vk] !== null)
+      const list = d.rows.filter(r => r.g === g && r.x === x && r[vk] != null)
         .sort((a, b) => a[rk] - b[rk] || a.n.localeCompare(b.n));
       if (list.length) divs.push({ g, x, list });
     }
   }
   if (!divs.length) {
-    const what = S.tab === 'o' ? 'overall places (they need both tests)' : 'results';
+    const what = S.tab === 'o' ? 'overall places (they need both tests)' : S.tab === 'm' ? 'mile times' : 'results';
     board.innerHTML = `<div class="card empty" style="margin-top:14px"><b>No ${what} here yet</b>Results show up the moment our team enters them.</div>`;
     return;
   }

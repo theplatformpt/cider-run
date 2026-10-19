@@ -7,8 +7,8 @@ body.staff{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .appbar .st{margin-left:auto;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-stretch:118%}
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:2px solid var(--dash);
   padding-bottom:env(safe-area-inset-bottom)}
-.nav .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
-.nav button{border:0;background:transparent;padding:10px 2px 12px;font-weight:800;font-size:13px;cursor:pointer;color:var(--muted);display:grid;gap:3px;justify-items:center}
+.nav .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+.nav button{border:0;background:transparent;padding:10px 1px 12px;font-weight:800;font-size:12px;cursor:pointer;color:var(--muted);display:grid;gap:3px;justify-items:center}
 .nav button svg{width:22px;height:22px}
 .nav button[aria-current="page"]{color:var(--red)}
 .nav button[aria-current="page"]::before{content:"";display:block;width:28px;height:4px;border-radius:4px;background:var(--red);margin-top:-10px;margin-bottom:6px}
@@ -29,6 +29,7 @@ body.staff{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .trials input{width:100%;text-align:center;font-size:30px;font-weight:900;padding:14px 4px;border:2px solid var(--dash);border-radius:14px;background:#fff}
 .trials input:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px rgba(209,71,15,.18)}
 .trials input.best{border-color:var(--gold);background:#FFF6DC}
+.trials.one{grid-template-columns:1fr;max-width:320px;margin-left:auto;margin-right:auto}
 .unit{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
 .standing{margin-top:14px;padding:12px 14px;border-radius:12px;background:#EEF4E6;color:var(--good);font-weight:800}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}

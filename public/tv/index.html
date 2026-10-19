@@ -39,6 +39,16 @@
   .dots{display:flex;gap:.5vw;flex-wrap:wrap;justify-content:center}
   .dots i{width:.8vw;height:.8vw;border-radius:50%;background:var(--dash)}
   .dots i.on{background:var(--orange)}
+  /* With a Mile column: 4 boards, smaller text, narrower QR panel */
+  body.four .tv{grid-template-columns:1fr 15vw}
+  body.four .cols{grid-template-columns:repeat(4,1fr);gap:1vw}
+  body.four .col{padding:1vw .9vw .4vw}
+  body.four .col h2{font-size:1.45vw}
+  body.four .col li{grid-template-columns:2.4vw 1fr auto;gap:.7vw}
+  body.four .col .badge{width:2.2vw;height:2.2vw;font-size:1vw}
+  body.four .col b{font-size:1.35vw}
+  body.four .col .v{font-size:1.6vw}
+  body.four aside .big{font-size:1.3vw}
   .msg{grid-column:1/2;display:grid;place-items:center;font-size:2.4vw;font-weight:900;color:var(--muted);background:var(--card);border-radius:1.2vw}
 </style>
 </head>

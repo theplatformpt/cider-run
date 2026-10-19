@@ -1,4 +1,4 @@
-import { $, esc, ordinal, fmtS, fmtJ, ago, poll, api } from './common.js';
+import { $, esc, ordinal, fmtS, fmtJ, fmtM, ago, poll, api } from './common.js';
 
 const token = location.pathname.split('/').filter(Boolean)[1] || '';
 let data = null, ok = true, formShown = false;
@@ -39,8 +39,14 @@ function render() {
     <div class="stat lead">
       <div class="k">Overall place</div>
       <div class="v">${showPlaces && a.overall.place ? `${ordinal(a.overall.place)}<small> of ${a.overall.of}</small>` : '–'}</div>
-      <div class="tr">${a.overall.place === null ? 'Finish both tests to get an overall place.' : showPlaces ? `In ${esc(a.division)}, ranking your sprint and jump together.` : 'Places show when results go live.'}</div>
-    </div>`;
+      <div class="tr">${a.overall.place == null ? 'Finish both tests to get an overall place.' : showPlaces ? `In ${esc(a.division)}, ranking your sprint and jump together.` : 'Places show when results go live.'}</div>
+    </div>
+    ${a.mile && a.mile.time != null ? `<div class="stat">
+      <div class="k">Mile</div>
+      <div class="v">${fmtM(a.mile.time)}</div>
+      ${showPlaces && a.mile.place ? `<div class="place">${place(a.mile.place, a.mile.of)}</div>` : ''}
+      <div class="tr">Cider Run mile. Not part of overall.</div>
+    </div>` : ''}`;
   if (!formShown) {
     formShown = true;
     $('#ppi').hidden = false;
@@ -69,6 +75,7 @@ $('#share').addEventListener('click', async () => {
   const bits = [];
   if (a.sprint.best !== null) bits.push(`${fmtS(a.sprint.best)} s ${data.yards}-yd dash`);
   if (a.jump.best !== null) bits.push(`${fmtJ(a.jump.best)} in vertical`);
+  if (a.mile && a.mile.time != null) bits.push(`${fmtM(a.mile.time)} mile`);
   const text = `My ${data.event} results: ${bits.join(', ') || 'coming soon'} 🍎`;
   if (navigator.share) { try { await navigator.share({ title: data.title, text, url: location.href }); } catch { /* cancelled */ } }
   else { try { await navigator.clipboard.writeText(`${text} ${location.href}`); $('#share').textContent = 'Link copied'; } catch { /* no clipboard */ } }

@@ -5,11 +5,11 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
 
 | Page | Who | What |
 |---|---|---|
-| `/` | Everyone (QR code) | Live leaderboard: Overall, Sprint, Jump, split by age group and sex. "Find yourself" search. Refreshes every 5 s. |
+| `/` | Everyone (QR code) | Live leaderboard: Overall, Sprint, Jump, Mile, split by age group and sex. "Find yourself" search. Refreshes every 5 s. |
 | `/r/<code>` | Each athlete | Their own results card with all trials and placings, plus a "Request a PPI session" form. |
 | `/tv/` | A TV or laptop at the event | Big-screen view that rotates through divisions, with the QR code. |
 | `/poster/` | Print | Letter-size QR poster for the leaderboard. |
-| `/staff/` | Staff (passcode) | Check in, Sprint station, Jump station, Athletes (edit/fix/delete), Setup. |
+| `/staff/` | Staff (passcode) | Check in, Sprint station, Jump station, Mile station, Athletes (edit/fix/delete), Setup. |
 
 ## Set it up (about 20 minutes, once)
 
@@ -40,6 +40,7 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
 
 - **Check-in table:** Check in tab. Each athlete gets an athlete number automatically (or type your own). It's only a lookup number: write it on their hand or a name sticker so stations can find them fast. No race bibs needed. The screen shows a QR the athlete scans to follow their own results.
 - **Sprint station / Jump station:** type the athlete # (or name), press Enter, type trial 1, Enter, trial 2, Enter… Enter on an empty box saves. Only trial 1 is required. Sprint and jump can be entered on different phones at the same time for the same athlete without overwriting each other.
+- **Mile station:** optional, only for people who ran the Cider Run mile. Type the athlete #, Enter, then the finish time as `7:42`, `7.42` or `742`, Enter. Anyone who wants a mile time must be checked in (age and sex set their division).
 - **Mistakes:** Athletes tab → tap the row → fix any trial, name, age or sex → Save. Delete is there too.
 - **After:** Setup → Results CSV (every trial, best marks, placings, contact info, results links) and PPI requests CSV.
 
@@ -47,6 +48,7 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
 
 - Best of up to 3 trials counts: lowest sprint time, highest jump.
 - Divisions are age group × sex. Default groups: 10 & under, 11–13, 14–17, 18–34, 35–49, 50+.
+- The mile is ranked on its own board (fastest first, same divisions) and is not part of overall.
 - Places use competition ranking: a tie shares a place (1, 2, 2, 4).
 - Overall = average of the athlete's sprint and jump percentile within their division (share of the division they beat, ties count half; a division of one gets 100). Needs both tests. Public pages show the overall **place** only, never the number, so last place never reads as "0". The number is in the staff Results CSV.
 - Public pages show first name + last initial and athlete # only. Emails, phones and results links are staff-only.
