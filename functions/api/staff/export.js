@@ -19,9 +19,9 @@ export async function onRequestGet({ request, env }) {
     'Overall score', 'Overall place', 'Mile time', 'Mile (seconds)', 'Mile place', 'Results link', 'Checked in',
   ]];
   for (const r of results) {
-    const b = board.rows[board._byId[r.id]];
+    const b = board.rows[board._byId[r.id]] || { g: null };
     rows.push([
-      r.bib, r.first, r.last, r.sex === 'M' ? 'Male' : 'Female', r.age, board.groups[b.g], r.email, r.phone,
+      r.bib, r.first, r.last, r.sex === 'M' ? 'Male' : r.sex === 'F' ? 'Female' : '', r.age, b.g === null ? 'Not checked in' : board.groups[b.g], r.email, r.phone,
       r.s1, r.s2, r.s3, b.s, b.sr, b.sp,
       r.j1, r.j2, r.j3, b.j, b.jr, b.jp,
       b.o, b.or, fmtMile(r.mile), r.mile, b.mr, `${origin}/r/${r.token}`, r.created_at,

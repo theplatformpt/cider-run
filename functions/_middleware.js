@@ -11,14 +11,32 @@ const MIGRATIONS = [
 ];
 let migrated = null;
 
+// Schema 2: sex and age may be blank, so people can be pre-registered by name
+// and give their age and sex when they arrive. SQLite can't relax NOT NULL in
+// place, so the table is copied into a new one inside a single transaction.
+const ATHLETES_V2 = `CREATE TABLE athletes_v2 (id INTEGER PRIMARY KEY AUTOINCREMENT, bib INTEGER NOT NULL UNIQUE, first TEXT NOT NULL, last TEXT NOT NULL, sex TEXT CHECK (sex IS NULL OR sex IN ('M','F')), age INTEGER CHECK (age IS NULL OR age BETWEEN 2 AND 110), email TEXT, phone TEXT, token TEXT NOT NULL UNIQUE, s1 REAL, s2 REAL, s3 REAL, j1 REAL, j2 REAL, j3 REAL, mile REAL, created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')), updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')))`;
+const COLS = 'id, bib, first, last, sex, age, email, phone, token, s1, s2, s3, j1, j2, j3, mile, created_at, updated_at';
+
 async function migrate(env) {
   if (!env.DB) return;
+  const D = env.DB;
   for (const m of MIGRATIONS) {
-    try { await env.DB.prepare(m.check).all(); }
+    try { await D.prepare(m.check).all(); }
     catch {
-      try { await env.DB.prepare(m.fix).run(); }
+      try { await D.prepare(m.fix).run(); }
       catch (e) { if (!/duplicate column/i.test(String(e && e.message))) throw e; }
     }
+  }
+  const v = await D.prepare("SELECT value FROM settings WHERE key = 'schema'").first();
+  if (Number(v?.value || 1) < 2) {
+    await D.batch([
+      D.prepare('DROP TABLE IF EXISTS athletes_v2'),
+      D.prepare(ATHLETES_V2),
+      D.prepare(`INSERT INTO athletes_v2 (${COLS}) SELECT ${COLS} FROM athletes`),
+      D.prepare('DROP TABLE athletes'),
+      D.prepare('ALTER TABLE athletes_v2 RENAME TO athletes'),
+      D.prepare("INSERT INTO settings (key, value) VALUES ('schema', '2') ON CONFLICT(key) DO UPDATE SET value = '2'"),
+    ]);
   }
 }
 

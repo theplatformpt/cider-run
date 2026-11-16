@@ -16,10 +16,12 @@ export async function onRequestPost({ request, env }) {
   const D = db(env);
 
   const dup = await D.prepare(
-    'SELECT bib FROM athletes WHERE lower(first) = lower(?1) AND lower(last) = lower(?2) AND age = ?3'
+    'SELECT bib, age FROM athletes WHERE lower(first) = lower(?1) AND lower(last) = lower(?2) AND (age = ?3 OR age IS NULL)'
   ).bind(fields.first, fields.last, fields.age).first();
   if (dup && !body.allowDuplicate) {
-    return error(`${fields.first} ${fields.last} (age ${fields.age}) is already checked in as #${dup.bib}.`, 409);
+    return error(dup.age === null
+      ? `${fields.first} ${fields.last} is already on the list as #${dup.bib}. Search for them above instead of adding them again.`
+      : `${fields.first} ${fields.last} (age ${fields.age}) is already checked in as #${dup.bib}.`, 409);
   }
 
   const token = newToken();
@@ -43,15 +45,15 @@ export async function onRequestPut({ request, env }) {
   if (list.length > 2000) return error('That file has more than 2,000 rows.');
   const D = db(env);
   const { results: existing } = await D.prepare('SELECT first, last, age, bib, email FROM athletes').all();
-  const seen = new Set(existing.map(r => `${r.first.toLowerCase()}|${r.last.toLowerCase()}|${r.age}`));
+  const seen = new Set(existing.map(r => `${r.first.toLowerCase()}|${r.last.toLowerCase()}`));
   const bibs = new Set(existing.map(r => r.bib));
   let nextBib = existing.reduce((m, r) => Math.max(m, r.bib), 0) + 1;
 
   const skipped = [], stmts = [];
   list.forEach((raw, i) => {
-    const { fields, error: bad } = cleanAthlete(raw, false);
+    const { fields, error: bad } = cleanAthlete(raw, false, true);
     if (bad) { skipped.push({ row: i + 2, reason: bad }); return; }
-    const key = `${fields.first.toLowerCase()}|${fields.last.toLowerCase()}|${fields.age}`;
+    const key = `${fields.first.toLowerCase()}|${fields.last.toLowerCase()}`;
     if (seen.has(key)) { skipped.push({ row: i + 2, reason: `${fields.first} ${fields.last} is already on the list.` }); return; }
     if (fields.bib && bibs.has(fields.bib)) { skipped.push({ row: i + 2, reason: `Athlete #${fields.bib} is already taken.` }); return; }
     seen.add(key);

@@ -38,7 +38,8 @@ Runs on Cloudflare Pages with a Cloudflare D1 database. No Airtable, so it can't
 
 ## On the day
 
-- **Check-in table:** Check in tab. Each athlete gets an athlete number automatically (or type your own). It's only a lookup number: write it on their hand or a name sticker so stations can find them fast. No race bibs needed. The screen shows a QR the athlete scans to follow their own results.
+- **Pre-registration:** Setup → Import sign-ups with a CSV of Number, First, Last. People imported without age/sex show as "Not checked in" and stay off the leaderboard until staff add age and sex, either on the Check in tab (search their name or #) or at the first station they visit.
+- **Check-in table:** Search the person by name or #, add age and sex, done. Walk-ups who aren't on the list: "Add a walk-up" gives them the next free number.
 - **Sprint station / Jump station:** type the athlete # (or name), press Enter, type trial 1, Enter, trial 2, Enter… Enter on an empty box saves. Only trial 1 is required. Sprint and jump can be entered on different phones at the same time for the same athlete without overwriting each other.
 - **Mile station:** optional, only for people who ran the Cider Run mile. Type the athlete #, Enter, then the finish time as `7:42`, `7.42` or `742`, Enter. Anyone who wants a mile time must be checked in (age and sex set their division).
 - **Mistakes:** Athletes tab → tap the row → fix any trial, name, age or sex → Save. Delete is there too.

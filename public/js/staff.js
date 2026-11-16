@@ -65,7 +65,8 @@ async function loadSettings() {
 
 const yards = () => S.settings?.sprintYards ?? 40;
 const groupOf = age => { const m = S.settings.ageMaxes; for (let i = 0; i < m.length; i++) if (age <= m[i]) return i; return m.length; };
-const divOf = a => `${a.sex === 'M' ? 'Male' : 'Female'} ${S.groups[groupOf(a.age)]}`;
+const hasDiv = a => !!a.sex && a.age !== null && a.age !== undefined;
+const divOf = a => (hasDiv(a) ? `${a.sex === 'M' ? 'Male' : 'Female'} ${S.groups[groupOf(a.age)]}` : 'Not checked in');
 const bestOf = (arr, low) => { const v = arr.filter(x => x !== null && x !== undefined); return v.length ? (low ? Math.min(...v) : Math.max(...v)) : null; };
 const fullName = a => `${a.first} ${a.last}`;
 
@@ -107,21 +108,55 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- check-in ---------- */
+function setCiSex(v) { S.sex = v || null; $$('#ci_sex button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v))); }
+
 function resetCheckin() {
   $('#ciFormCard').hidden = false; $('#ciDone').hidden = true;
-  ['first', 'last', 'age', 'bib', 'email', 'phone'].forEach(k => { $(`#ci_${k}`).value = ''; });
-  S.sex = null; $$('#ci_sex button').forEach(b => b.setAttribute('aria-pressed', 'false'));
-  $('#ciErr').textContent = ''; $('#ciDup').hidden = true; S.dupBody = null;
-  $('#ci_first').focus();
+  $('#ciFind').hidden = false; $('#ciForm').hidden = true;
+  S.ciPick = null; $('#ciq').value = ''; renderCiList();
+  $('#ciq').focus();
 }
-$$('#ci_sex button').forEach(b => b.addEventListener('click', () => {
-  S.sex = b.dataset.v; $$('#ci_sex button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-}));
+
+function openCiForm(a) {
+  S.ciPick = a || null;
+  ['first', 'last', 'age', 'bib', 'email', 'phone'].forEach(k => { $(`#ci_${k}`).value = a ? (a[k] ?? '') : ''; });
+  setCiSex(a ? a.sex : null);
+  $('#ci_bib').closest('label').hidden = !!a;
+  $('#ciFormLede').textContent = a ? `Athlete #${a.bib}. Check the name, then add age and sex.` : 'Walk-up: add them and give them an athlete number. Names show on the board as first name + last initial.';
+  $('#ciSave').textContent = a ? 'Check in' : 'Add and check in';
+  $('#ciErr').textContent = ''; $('#ciDup').hidden = true; S.dupBody = null;
+  $('#ciFind').hidden = true; $('#ciForm').hidden = false;
+  (a ? (a.sex ? $('#ci_age') : $('#ci_sex button')) : $('#ci_first')).focus();
+}
+
+function renderCiList() {
+  const q = $('#ciq').value;
+  const hits = search(q);
+  $('#ciList').innerHTML = hits.map(a => `<button class="pick" data-ci="${a.id}"><span class="bib">${a.bib}</span>
+      <span><span class="nm">${esc(fullName(a))}</span><br><span class="meta">${esc(divOf(a))}</span></span>
+      <span class="done">${hasDiv(a) ? '✓ in' : ''}</span></button>`).join('')
+    || (q.trim() ? `<p style="color:var(--muted)">Not on the list. Check the spelling, or add them as a walk-up.</p>` : '');
+  const done = S.athletes.filter(hasDiv).length;
+  $('#ciCount').textContent = `${done} of ${S.athletes.length} checked in.`;
+}
+$('#ciq').addEventListener('input', renderCiList);
+$('#ciq').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const hits = search($('#ciq').value);
+  if (hits.length === 1 || (hits[0] && String(hits[0].bib) === $('#ciq').value.trim().replace(/^#/, ''))) openCiForm(hits[0]);
+});
+$('#ciList').addEventListener('click', e => { const p = e.target.closest('[data-ci]'); if (p) openCiForm(S.athletes.find(a => a.id === Number(p.dataset.ci))); });
+$('#ciWalkup').addEventListener('click', () => openCiForm(null));
+$('#ciBack').addEventListener('click', resetCheckin);
+$$('#ci_sex button').forEach(b => b.addEventListener('click', () => setCiSex(b.dataset.v)));
 
 async function checkIn(body) {
   const btn = $('#ciSave'); btn.disabled = true;
   try {
-    const d = await call('/api/staff/athletes', { method: 'POST', body });
+    const d = S.ciPick
+      ? await call(`/api/staff/athletes/${S.ciPick.id}`, { method: 'PATCH', body: (({ bib, allowDuplicate, ...rest }) => rest)(body) })
+      : await call('/api/staff/athletes', { method: 'POST', body });
     upsertLocal(d.athlete);
     $('#ciFormCard').hidden = true; $('#ciDone').hidden = false;
     $('#ciDoneBib').textContent = `Athlete #${d.athlete.bib}`;
@@ -196,6 +231,17 @@ $('#stq').addEventListener('keydown', e => {
 });
 $('#stList').addEventListener('click', e => { const p = e.target.closest('[data-pick]'); if (p) openAthlete(Number(p.dataset.pick)); });
 
+function setStSex(v) { S.stSex = v || null; $$('#st_sex button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v))); }
+$$('#st_sex button').forEach(b => b.addEventListener('click', () => setStSex(b.dataset.v)));
+// When the athlete hasn't been checked in yet, the station collects age and sex with the result.
+function checkInFields() {
+  if ($('#stCheck').hidden) return {};
+  const age = $('#st_age').value === '' ? NaN : Number($('#st_age').value);
+  if (!S.stSex) return { error: 'Pick female or male first. It sets their leaderboard division.' };
+  if (!Number.isInteger(age) || age < 2 || age > 110) return { error: 'Enter their age first.' };
+  return { sex: S.stSex, age };
+}
+
 function trialInputs() { return $$('#stTrials input'); }
 function currentValues() { return trialInputs().map(i => i.value.trim()); }
 function dirty() { return !!S.current && !$('#stPanel').hidden && JSON.stringify(currentValues()) !== JSON.stringify(S.saved); }
@@ -207,9 +253,11 @@ async function openAthlete(id) {
   try { a = (await call(`/api/staff/athletes/${id}`)).athlete; upsertLocal(a); } catch { /* use cached copy */ }
   S.current = a;
   $('#stSearchCard').hidden = true; $('#stPanel').hidden = false;
-  $('#stBib').textContent = a.bib; $('#stName').textContent = fullName(a); $('#stDiv').textContent = `${divOf(a)} · age ${a.age}`;
+  $('#stBib').textContent = a.bib; $('#stName').textContent = fullName(a); $('#stDiv').textContent = hasDiv(a) ? `${divOf(a)} · age ${a.age}` : 'Not checked in yet';
   trialInputs().forEach((inp, i) => { const v = valuesOf(a, t)[i]; inp.value = v === null || v === undefined ? '' : t.single ? t.fmt(v) : v; });
   S.saved = currentValues();
+  const needs = !hasDiv(a);
+  $('#stCheck').hidden = !needs; $('#st_age').value = ''; setStSex(null);
   $('#stErr').textContent = ''; $('#stStanding').hidden = true;
   markBest();
   const firstEmpty = trialInputs().find(i => !i.value) || trialInputs()[0];
@@ -241,6 +289,8 @@ function closePanel() {
 }
 
 async function saveMile(a, t) {
+  const ci = checkInFields();
+  if (ci.error) { $('#stErr').textContent = ci.error; return; }
   const sec = parseMile($('#tr1').value);
   if (Number.isNaN(sec)) { $('#stErr').textContent = "Can't read that time. Type it like 7:42."; return; }
   if (sec !== null && (sec < 180 || sec > 3600)) { $('#stErr').textContent = 'Mile time must be between 3:00 and 60:00.'; return; }
@@ -248,13 +298,14 @@ async function saveMile(a, t) {
   if (sec !== null && (sec < lo || sec > hi) && !confirm(`${fmtM(sec)} looks unusual for a mile. Save anyway?`)) return;
   const btn = $('#stSave'); btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    const d = await call(`/api/staff/athletes/${a.id}`, { method: 'PATCH', body: { mile: sec } });
+    const d = await call(`/api/staff/athletes/${a.id}`, { method: 'PATCH', body: { mile: sec, ...ci } });
+    if (ci.sex) { $('#stCheck').hidden = true; $('#stDiv').textContent = `${divOf(d.athlete)} · age ${d.athlete.age}`; }
     upsertLocal(d.athlete); S.current = d.athlete;
     $('#tr1').value = sec === null ? '' : fmtM(sec); S.saved = currentValues(); setUnitHint();
     const st = d.standing;
     $('#stErr').textContent = '';
     $('#stStanding').hidden = false;
-    $('#stStanding').textContent = sec === null ? 'Saved. Mile time cleared.' : `Saved. Mile ${fmtM(st.m)}: ${ordinal(st.mr)} of ${st.mn} in ${st.division}.`;
+    $('#stStanding').textContent = sec === null || !st ? 'Saved. Mile time cleared.' : `Saved. Mile ${fmtM(st.m)}: ${ordinal(st.mr)} of ${st.mn} in ${st.division}.`;
     toast('Saved ✓');
   } catch (x) {
     $('#stErr').textContent = x.message;
@@ -265,6 +316,8 @@ async function saveTrials() {
   const a = S.current; if (!a) return;
   const t = T[S.view];
   if (t.single) return saveMile(a, t);
+  const ci = checkInFields();
+  if (ci.error) { $('#stErr').textContent = ci.error; return; }
   const raw = currentValues();
   const vals = raw.map(v => (v === '' ? null : Number(v.replace(',', '.'))));
   if (vals.some((v, i) => raw[i] !== '' && !Number.isFinite(v))) { $('#stErr').textContent = 'Only numbers, please.'; return; }
@@ -274,13 +327,14 @@ async function saveTrials() {
   if (odd.length && !confirm(`${odd.map(v => `${v} ${t.unit}`).join(', ')} looks unusual for this test. Save anyway?`)) return;
   const btn = $('#stSave'); btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    const d = await call(`/api/staff/athletes/${a.id}`, { method: 'PATCH', body: { [t.key]: vals } });
+    const d = await call(`/api/staff/athletes/${a.id}`, { method: 'PATCH', body: { [t.key]: vals, ...ci } });
     upsertLocal(d.athlete); S.current = d.athlete; S.saved = currentValues();
+    if (ci.sex) { $('#stCheck').hidden = true; $('#stDiv').textContent = `${divOf(d.athlete)} · age ${d.athlete.age}`; }
     const st = d.standing;
     const best = S.view === 'sprint' ? st?.s : st?.j;
     const place = S.view === 'sprint' ? st?.sr : st?.jr;
     const of = S.view === 'sprint' ? st?.sn : st?.jn;
-    const msg = best !== null && best !== undefined
+    const msg = st && best !== null && best !== undefined
       ? `Saved. Best ${t.fmt(best)} ${t.unit}: ${ordinal(place)} of ${of} in ${st.division}${st.o !== null ? ` · overall ${ordinal(st.or)}` : ''}.`
       : 'Saved. Trials cleared.';
     $('#stErr').textContent = '';
@@ -314,7 +368,7 @@ function renderAthletes() {
   const q = $('#athq').value.trim();
   const list = q ? search(q).concat([]) : S.athletes;
   const nS = S.athletes.filter(a => bestOf(a.s, true) !== null).length, nJ = S.athletes.filter(a => bestOf(a.j, false) !== null).length, nM = S.athletes.filter(a => a.mile != null).length;
-  $('#athCount').textContent = `${S.athletes.length} checked in · ${nS} sprinted · ${nJ} jumped · ${nM} ran the mile. Tap a row to edit or fix a result.`;
+  $('#athCount').textContent = `${S.athletes.length} on the list · ${S.athletes.filter(hasDiv).length} checked in · ${nS} sprinted · ${nJ} jumped · ${nM} ran the mile. Tap a row to edit or fix a result.`;
   $('#athBody').innerHTML = list.map(a => {
     const bs = bestOf(a.s, true), bj = bestOf(a.j, false);
     return `<tr class="click" data-edit="${a.id}"><td><b>${a.bib}</b></td><td>${esc(fullName(a))}</td><td>${esc(divOf(a))}</td>
@@ -342,7 +396,7 @@ $('#edSave').addEventListener('click', async () => {
   const a = S.editing;
   const num = v => (v.trim() === '' ? null : Number(v.replace(',', '.')));
   const body = {
-    first: $('#ed_first').value, last: $('#ed_last').value, sex: $('#ed_sex').value, age: Number($('#ed_age').value),
+    first: $('#ed_first').value, last: $('#ed_last').value, sex: $('#ed_sex').value, age: $('#ed_age').value === '' ? null : Number($('#ed_age').value),
     bib: $('#ed_bib').value === '' ? a.bib : Number($('#ed_bib').value), phone: $('#ed_phone').value, email: $('#ed_email').value,
     s: $$('#ed_s input').map(i => num(i.value)), j: $$('#ed_j input').map(i => num(i.value)),
     mile: parseMile($('#ed_mile').value),
@@ -454,8 +508,9 @@ $('#impFile').addEventListener('change', async e => {
   const rows = parseCsv(await f.text());
   if (rows.length < 2) { $('#impPreview').textContent = 'That file has no rows.'; $('#impGo').hidden = true; return; }
   S.importRows = mapRows(rows);
-  const missing = S.importRows.filter(r => !r.sex || r.age === null || !r.first || !r.last).length;
-  $('#impPreview').innerHTML = `Found <b>${S.importRows.length}</b> rows.` + (missing ? ` <span class="danger">${missing} are missing a name, sex or age and will be skipped; check those in on the day.</span>` : '');
+  const missing = S.importRows.filter(r => !r.first || !r.last).length;
+  const noDiv = S.importRows.filter(r => r.first && r.last && (!r.sex || r.age === null)).length;
+  $('#impPreview').innerHTML = `Found <b>${S.importRows.length}</b> rows.` + (missing ? ` <span class="danger">${missing} have no name and will be skipped.</span>` : '') + (noDiv ? ` ${noDiv} have no age/sex yet; they'll be added as not checked in.` : '');
   $('#impGo').hidden = false; $('#impGo').textContent = `Import ${S.importRows.length - missing} athletes`;
 });
 $('#impGo').addEventListener('click', async () => {
