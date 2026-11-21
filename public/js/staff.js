@@ -184,7 +184,7 @@ $('#ciNext').addEventListener('click', resetCheckin);
 
 /* ---------- stations ---------- */
 const T = {
-  sprint: { key: 's', unit: 's', fmt: fmtS, low: true, step: '0.01', plaus: () => [yards() * 0.095, yards() * 0.4] },
+  sprint: { key: 's', unit: 's', fmt: fmtS, low: true, step: '0.01', plaus: () => [0, Infinity] },
   jump: { key: 'j', unit: 'in', fmt: fmtJ, low: false, step: '0.1', plaus: () => [2, 45] },
   mile: { key: 'mile', single: true, unit: '', fmt: fmtM, low: true, plaus: () => [270, 1800] },
 };
